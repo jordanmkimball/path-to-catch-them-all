@@ -1,6 +1,7 @@
 body {
-  padding: 50px;
+  /* Padding started at 50px by default*/
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: azure
 }
 
 a {
@@ -8,9 +9,9 @@ a {
 }
 
 /* THIS IS THE CODE FOR THE TOPNAV BAR IN LAYOUT.PUG
-/* Add a black background color to the top navigation */
+/* Add a blue background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: blue;
   overflow: hidden;
 }
 
@@ -32,7 +33,14 @@ a {
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: #4CAF50;
+  background-color: black;
   color: white;
 }
 /*END OF CODE FOR LAYOUT BAR IN LAYOUT.PUG!*/
+
+/*START OF MAINTEXT: Properties affecting the main body of website text. */
+/*Should consider having padding of about 50px for everything after topNav bar. */
+
+.maintext {
+  padding: 75px;
+}
