@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
+//Attempting to get app to use sqlite3
+var sqlite3 = require('sqlite3');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

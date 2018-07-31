@@ -1,5 +1,6 @@
 //WHERE I will put requirements linked to the Sqlite3 database probably
-
+var sqlite3 = require('sqlite3');
+var db = new sqlite3.Database('Pokemon.db');
 
 
 //Display Existing Players Page on GET
@@ -15,4 +16,22 @@ exports.about_get = function (req, res){
 //Display New Players Page
 exports.new_get = function (req, res){
     res.send('NOT IMPLIMENTED: new_get should be here');
-}
+};
+
+//Display the Pokemon search page
+exports.pokemon_search = function (req, res, next){
+    res.send('NOT IMPLIMENTED: pokemon_search will go here');
+};
+
+//Display information about a single pokemon by id
+exports.pokemon_id_search = function (req, res, next){
+    console.log("Return pokemon with Id: " + req.params.id);
+    db.get('SELECT * FROM AvPokemon WHERE id = ?', [req.params.id], function (err, row) {
+        if (err) {
+            res.send(err.message);
+        }
+        else{
+            res.json(row);
+        }
+    });
+};

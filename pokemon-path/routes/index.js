@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
-
 //Require Controller Modules
 var main_controller = require('../controllers/mainController');
+
+
+//MAIN PAGES
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -17,5 +19,16 @@ router.get('/about', main_controller.about_get);
 
 //GET request for new players page.
 router.get('/new', main_controller.new_get);
+
+
+//SEARCH PAGES
+
+//GET request for search page
+router.get('/search', main_controller.pokemon_search);
+
+//GET request for 1 pokemon by id
+router.get('/search/:id', main_controller.pokemon_id_search);
+
+
 
 module.exports = router;
