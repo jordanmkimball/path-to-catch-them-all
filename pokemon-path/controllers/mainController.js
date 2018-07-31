@@ -1,6 +1,17 @@
+var express = require('express');
+var app = express();
+
+//Code to enable body-parser to be used 
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: true}));
+
 //WHERE I will put requirements linked to the Sqlite3 database probably
 var sqlite3 = require('sqlite3');
-var db = new sqlite3.Database('Pokemon.db');
+var db = new sqlite3.Database('pokemon.db');
+
+
+
+//START OF GET request Functions
 
 
 //Display Existing Players Page on GET
