@@ -1,0 +1,29 @@
+ var Names = [];
+                for (var i=0; i<rows.length; i++){
+                    Names.push(rows[i].Name);
+                }
+                res.render('avail_game', {title: 'Pokémon Available in ', names: Names});
+
+
+
+//Code for a removed route that didn't work with Query Strings
+
+//GET request for list of available pokemon in a particular game
+router.get('/search/where', main_controller.pokemon_avail_game);
+
+CODE IN mainController.js
+
+//Display list of available pokemon in a particular game
+//Use with localhost:3000/search/where?game=USun
+exports.pokemon_avail_game = function (req, res, next){
+    if (req.query.game) {
+        db.get('SELECT Name FROM AvPokemon WHERE ? IN ("C","E","B","R","S")', function (err,row){
+            if (err) {res.send(err.message);}
+            //No Error so render
+            else{
+                console.log('Return list of Pokemon Available in ' + req.query.game);
+                res.json(row);
+            }
+        }
+        )};
+};

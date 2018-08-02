@@ -26,8 +26,17 @@ router.get('/new', main_controller.new_get);
 //GET request for search page
 router.get('/search', main_controller.pokemon_search);
 
+//POST request for search page
+router.post('/search', main_controller.pokemon_search_post);
+
+//GET request for list of available pokemon in Ultra Sun
+router.get('/search/availability/ultrasun', main_controller.pokemon_avail_ultrasun);
+
+
 //GET request for 1 pokemon by id
 router.get('/search/:id', main_controller.pokemon_id_search);
+
+
 
 
 
