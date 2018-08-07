@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  div.maintext
+    h1= title
+    
+    h3 Which games do you own?
+
+    form(method='POST' action='')
+      div.form-group 
+        label Games:
+        div
+          div(style='display: inline; padding-right:10px;')
+            input.checkbox-input(type='checkbox', name='ultra_sun', id="ultraSunBox", value='ultra_sun')
+            label Ultra Sun
+            <br>
+            input.checkbox-input(type='checkbox', name='x', id="xBox", value='x')
+            label X
+      <br>
+      <br>    
+      button.btn.btn-primary(type='submit') Submit
