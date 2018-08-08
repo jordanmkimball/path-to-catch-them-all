@@ -12,6 +12,8 @@ var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('pokemon.db');
 
+//My own custom module to decode the availability letters.
+var ad = require('./availabilityDecoder');
 
 
 //START OF GET REQUEST FUNCTIONS
@@ -416,10 +418,11 @@ exports.pokemon_search3_post = function (req, res, next){
     var inAs = ' IN ("C","E","B","R","S") THEN 1 ELSE 0 END) AS ';
     //Case where user didn't check any of the boxes. Return full list of Pokemon
     if (gameCount == 0) {
-        var sqlQuery = 'SELECT Id, Name FROM AvPokemon';
-        var sqlCountQuery = 'SELECT COUNT(Id) AS Pokemon_Count FROM AvPokemon';
+        var sqlQuery = 'SELECT Id, Name FROM AvPokemon WHERE Id NOT IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 801, 802, 807)';
+        var sqlCountQuery = 'SELECT COUNT(Id) AS Pokemon_Count FROM AvPokemon WHERE Id NOT IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 801, 802, 807)';
         //Attempting to make the SQL Recommendation Query
         var sqlRecQuery = 'SELECT ' + sumWhen + 'USun' + inAs + 'USunR,' + sumWhen + 'UMoon' + inAs + 'UMoonR,' + sumWhen + 'OmegaR' + inAs + 'OmegaRR,' + sumWhen + 'AlphaS' + inAs + 'AlphaSR,' + sumWhen + 'X' + inAs + 'XR,' + sumWhen + 'Y' + inAs + 'YR,' +  sumWhen + 'Crystal3DS' + inAs + 'Crystal3DSR ' + 'FROM AvPokemon'; 
+        var sqlEventQuery = 'SELECT Id, Name FROM AvPokemon WHERE Id IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 802, 807)'
     }
     else{
         var whereStatement = ultraSun + ultraMoon + sun + moon + omegaRuby + alphaSapphire + friendSafari + x + y + black2 + white2 + black + white + pokewalker + heartGold + soulSilver + diamond + pearl + platinum + fireRed + leafGreen + ruby + sapphire + emerald + gold + silver + crystal3DS + crystal + red + blue + yellow
@@ -430,7 +433,7 @@ exports.pokemon_search3_post = function (req, res, next){
         //Including query to count the number of missing Pokemon
         var sqlCountQuery = 'SELECT COUNT(Id) AS Pokemon_Count FROM AvPokemon WHERE ' + newWhereStatement + ' AND Id NOT IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 801, 802, 807)';
         var sqlRecQuery = 'SELECT ' + sumWhen + 'USun' + inAs + 'USunR,' + sumWhen + 'UMoon' + inAs + 'UMoonR,' + sumWhen + 'OmegaR' + inAs + 'OmegaRR,' + sumWhen + 'AlphaS' + inAs + 'AlphaSR,' + sumWhen + 'X' + inAs + 'XR,' + sumWhen + 'Y' + inAs + 'YR,' +  sumWhen + 'Crystal3DS' + inAs + 'Crystal3DSR ' + 'FROM AvPokemon WHERE ' + newWhereStatement;
-        var sqlEventQuery = 'SELECT Id, Name FROM AvPokemon WHERE Id IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 802, 807)'
+        var sqlEventQuery = 'SELECT Id, Name FROM AvPokemon WHERE Id IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 802)'
     }
     console.log(sqlQuery);
     console.log(sqlCountQuery);
@@ -544,15 +547,91 @@ exports.pokemon_avail_ultramoon = function (req, res, next){
 //Display information about a single pokemon by id
 exports.pokemon_id_search = function (req, res, next){
     console.log("Return pokemon with Id: " + req.params.id);
-    db.get('SELECT Id, Name, USun, UMoon FROM AvPokemon WHERE id = ?', [req.params.id], function (err, row) {
+    var sqlStatement = 'SELECT Id, Name, USun, UMoon, Sun, Moon, OmegaR, AlphaS, FSafari, X, Y, White2, Black2, White, Black, Pokewalker, SoulSilver, HeartGold, Platinum, Pearl, Diamond, Emerald, LeafGreen, FireRed, Sapphire, Ruby, Crystal3DS, Crystal, Silver, Gold, Yellow, JpBlue, EngBlue, Red FROM AvPokemon WHERE id = ?';
+    db.get(sqlStatement, [req.params.id], function (err, row) {
         if (err) { res.send(err.message); }
         //No error so render. 
         else{
-            var pokedexNumber = 'Pokédex Number: ' + row.Id;
-            var pokemonName = 'Pokémon Name: ' + row.Name;
-            var ultraSun = 'Ultra Sun Availability: ' + row.USun;
-            var ultraMoon = 'Ultra Moon Availability: ' + row.UMoon;
-            res.render('pokemon_id_search', {title: 'Pokémon Availability Details', pokemon_id: pokedexNumber, pokemon_name: pokemonName, ultra_sun: ultraSun, ultra_moon: ultraMoon});
+            var pokedexNumber = row.Id;
+            var pokemonName = row.Name;
+            //Using the custom availabilityDecoder Module and its functions
+            var UltraSun = ad.availabilityDecoder(row.USun);
+            var UltraSunMethod = ad.availabilityMethod(row.USun);
+            var UltraMoon = ad.availabilityDecoder(row.UMoon);
+            var UltraMoonMethod = ad.availabilityMethod(row.UMoon);
+            var Sun = ad.availabilityDecoder(row.Sun);
+            var SunMethod = ad.availabilityMethod(row.Sun);
+            var Moon = ad.availabilityDecoder(row.Moon);
+            var MoonMethod = ad.availabilityMethod(row.Moon);
+            var AlphaSapphire = ad.availabilityDecoder(row.AlphaS);
+            var AlphaSapphireMethod = ad.availabilityMethod(row.AlphaS);
+            var OmegaRuby = ad.availabilityDecoder(row.OmegaR);
+            var OmegaRubyMethod = ad.availabilityMethod(row.OmegaR);
+            var FriendSafari = ad.availabilityDecoder(row.FSafari);
+            var FriendSafariMethod = ad.availabilityMethod(row.FSafari);
+            var X = ad.availabilityDecoder(row.X);
+            var XMethod = ad.availabilityMethod(row.X);
+            var Y = ad.availabilityDecoder(row.Y);
+            var YMethod = ad.availabilityMethod(row.Y);
+            var Black2 = ad.availabilityDecoder(row.Black2);
+            var Black2Method = ad.availabilityMethod(row.Black2);
+            var White2 = ad.availabilityDecoder(row.White2);
+            var White2Method = ad.availabilityMethod(row.White2);
+            var Black = ad.availabilityDecoder(row.Black);
+            var BlackMethod = ad.availabilityMethod(row.Black);
+            var White = ad.availabilityDecoder(row.White);
+            var WhiteMethod = ad.availabilityMethod(row.White);
+            var HeartGold = ad.availabilityDecoder(row.HeartGold);
+            var HeartGoldMethod = ad.availabilityMethod(row.HeartGold);
+            var SoulSilver = ad.availabilityDecoder(row.SoulSilver);
+            var SoulSilverMethod = ad.availabilityMethod(row.SoulSilver);
+            var Pokewalker = ad.availabilityDecoder(row.Pokewalker);
+            var PokewalkerMethod = ad.availabilityMethod(row.Pokewalker);
+            var Diamond = ad.availabilityDecoder(row.Diamond);
+            var DiamondMethod = ad.availabilityMethod(row.Diamond);
+            var Pearl = ad.availabilityDecoder(row.Pearl);
+            var PearlMethod = ad.availabilityMethod(row.Pearl);
+            var Platinum = ad.availabilityDecoder(row.Platinum);
+            var PlatinumMethod = ad.availabilityMethod(row.Platinum);
+            var FireRed = ad.availabilityDecoder(row.FireRed);
+            var FireRedMethod = ad.availabilityMethod(row.FireRed);
+            var LeafGreen = ad.availabilityDecoder(row.LeafGreen);
+            var LeafGreenMethod = ad.availabilityMethod(row.LeafGreen);
+            var Ruby = ad.availabilityDecoder(row.Ruby);
+            var RubyMethod = ad.availabilityMethod(row.Ruby);
+            var Sapphire = ad.availabilityDecoder(row.Sapphire);
+            var SapphireMethod = ad.availabilityMethod(row.Sapphire);
+            var Emerald = ad.availabilityDecoder(row.Emerald);
+            var EmeraldMethod = ad.availabilityMethod(row.Emerald);
+            var Gold = ad.availabilityDecoder(row.Gold);
+            var GoldMethod = ad.availabilityMethod(row.Gold);
+            var Silver = ad.availabilityDecoder(row.Silver);
+            var SilverMethod = ad.availabilityMethod(row.Silver);
+            var Crystal3DS = ad.availabilityDecoder(row.Crystal3DS);
+            var Crystal3DSMethod = ad.availabilityMethod(row.Crystal3DS);
+            var Crystal = ad.availabilityDecoder(row.Crystal);
+            var CrystalMethod = ad.availabilityMethod(row.Crystal);
+            var Red = ad.availabilityDecoder(row.Red);
+            var RedMethod = ad.availabilityMethod(row.Red);
+            var Blue = ad.availabilityDecoder(row.EngBlue);
+            var BlueMethod = ad.availabilityMethod(row.EngBlue);
+            var Yellow = ad.availabilityDecoder(row.Yellow);
+            var YellowMethod = ad.availabilityMethod(row.Yellow);
+
+            res.render('pokemon_id_search', {title: 'Pokémon Availability Details', pokemon_id: pokedexNumber, pokemon_name: pokemonName, 
+            ultra_sun: UltraSun, ultra_sun_method: UltraSunMethod, ultra_moon: UltraMoon, ultra_moon_method: UltraMoonMethod, sun: Sun, sun_method: SunMethod, 
+            moon: Moon, moon_method: MoonMethod, alpha_sapphire: AlphaSapphire, alpha_sapphire_method: AlphaSapphireMethod, 
+            omega_ruby: OmegaRuby, omega_ruby_method: OmegaRubyMethod, friend_safari: FriendSafari, friend_safari_method: FriendSafariMethod, 
+            x: X, x_method: XMethod, y: Y, y_method: YMethod, black_2: Black2, black_2_method: Black2Method, 
+            white_2: White2, white_2_method: White2Method, black: Black, black_method: BlackMethod, white: White, white_method: WhiteMethod, 
+            heartgold: HeartGold, heartgold_method: HeartGoldMethod, soulsilver: SoulSilver, soulsilver_method: SoulSilverMethod, 
+            pokewalker: Pokewalker, pokewalker_method: PokewalkerMethod, diamond: Diamond, diamond_method: DiamondMethod, pearl: Pearl, pearl_method: PearlMethod, 
+            platinum: Platinum, platinum_method: PlatinumMethod, firered: FireRed, firered_method: FireRedMethod, leafgreen: LeafGreen, leafgreen_method: LeafGreenMethod, 
+            ruby: Ruby, ruby_method: RubyMethod, sapphire: Sapphire, sapphire_method: SapphireMethod, emerald: Emerald, emerald_method: EmeraldMethod, 
+            crystal3ds: Crystal3DS, crystal3ds_method: Crystal3DSMethod, crystal: Crystal, crystal_method: CrystalMethod, 
+            gold: Gold, gold_method: GoldMethod, silver: Silver, silver_method: SilverMethod, red: Red, red_method: RedMethod, 
+            blue: Blue, blue_method: BlueMethod, yellow: Yellow, yellow_method: YellowMethod
+        });
         }
     });
 };

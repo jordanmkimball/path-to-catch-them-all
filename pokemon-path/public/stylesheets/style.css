@@ -44,3 +44,13 @@ a {
 .maintext {
   padding: 75px;
 }
+
+/* use this class to underline specified text */
+.underline {
+    text-decoration: underline;
+}
+
+/* This is for the pokemon_id_search.pug page */
+#IdAndName {
+    text-align: center;
+}
