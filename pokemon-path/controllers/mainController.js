@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 //Code to use async
 var async = require('async');
 
-//WHERE I will put requirements linked to the Sqlite3 database probably
+//Declaring the sqlite3 database
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('pokemon.db');
 
@@ -19,115 +19,24 @@ var ad = require('./availabilityDecoder');
 //START OF GET REQUEST FUNCTIONS
 
 
-//Display Existing Players Page on GET
-exports.existing_get = function (req, res){
-    res.send('NOT IMPLIMENTED: existing_get page should be here');
-};
 
-//Display About Page
+//Display About Page on GET
 exports.about_get = function (req, res){
-    res.send('NOT IMPLIMENTED: about_get page should be here');
+    res.render('about');
 };
 
-//Display New Players Page
-exports.new_get = function (req, res){
-    res.send('NOT IMPLIMENTED: new_get should be here');
+//Display New Players Page on GET
+exports.new_get = function (req, res, next){
+    res.render('new_players');
 };
 
-//START OF POKEMON SEARCH FUNCTIONS
-
-//Display the Pokemon search page
-exports.pokemon_search = function (req, res, next){
-    res.render('pokemon_search', {title: 'Find availability by game'});
-};
-
-//Handle pokemon search POST to show either list of all pokemon, or pokemon in Ultra Sun
-exports.pokemon_search_post = function (req, res, next){
-    console.log(req.body.ultra_sun)
-        if (req.body.ultra_sun == 'ultra_sun'){
-            var sqlQuery = 'SELECT Name FROM AvPokemon WHERE USun IN ("C","E","B","R","S")';
-            }
-        else {
-            var sqlQuery = 'SELECT Name FROM AvPokemon';
-        }
-    db.all(sqlQuery, function (err,rows) {
-        if (err) {res.send(err.message);}
-        //No error so render
-        else{
-            var Names = [];
-            for (var i=0; i<rows.length; i++){
-                Names.push(rows[i].Name);
-            }
-            res.render('avail_usun', {title: 'Pokémon List', names: Names});
-        }
-    })
-};
-
-//Display the pokemon search2 page on GET
-exports.pokemon_search2 = function (req, res, next){
-    res.render('pokemon_search2', {title: 'Which Pokémon are you missing?'});
-};
-
-
-//Display missing pokemon on search2 POST
-exports.pokemon_search_post2 = function (req, res, next){
-    //Seeing whether the user checked the Ultra Sun or X boxes
-    console.log(req.body.ultra_sun);
-    console.log(req.body.x);
-    //Game count necessary in case user didn't select any boxes
-    var gameCount = 0;
-    if (req.body.ultra_sun == 'ultra_sun') {
-        var ultraSun = ' AND USun NOT IN ("C","E","B","R","S")';
-        gameCount+= 1;
-    }
-    else{
-        var ultraSun = '';
-    }
-    if (req.body.x == 'x') {
-        var x = ' AND X NOT IN ("C","E","B","R","S")';
-        gameCount+= 1;
-    }
-    else{
-        var x = '';
-    }
-    //Case where user didn't select any of the options. Return full list of Pokemon
-    if (gameCount == 0) {
-        var sqlQuery = 'SELECT Id, Name FROM AvPokemon';
-    }
-    else{
-        var whereStatement = ultraSun + x
-        //Need to delete the extra ' AND' so SQL doesn't freak out
-        var newWhereStatement = whereStatement.replace(' AND', '');
-        var sqlQuery = 'SELECT Id, Name FROM AvPokemon WHERE ' + newWhereStatement;
-    }
-    console.log(sqlQuery);
-    //Now to actually pull the information from the database. 
-    db.all(sqlQuery, function (err,rows) {
-        if (err) {res.send(err.message);}
-        //No error so render
-        var Ids = [];
-        for (var i=0; i<rows.length; i++){
-            Ids.push(rows[i].Id);
-        }
-        var Names = [];
-        for (var i=0; i<rows.length; i++){
-            Names.push(rows[i].Name);
-        }
-        var Pokemon = {};
-        Ids.forEach((Id, i) => Pokemon[Id] = Names[i]);
-        res.render('missing_pokemon', {title: 'Pokémon you are not able to catch in game based on your current games', pokemon: Pokemon});
-    })
-};
-
-
-//Display pokemon_search3 page on GET
-exports.pokemon_search3 = function (req, res, next){
-    res.render('pokemon_search3', {title: 'Which Pokémon are you missing?'});
+//Display Your Path Page on GET
+exports.yourPathGet = function (req, res, next){
+    res.render('your_path', {title: 'Which Pokémon are you missing?'});
 };
  
-
-//Display missing pokemon for pokemon_search3 on POST
-exports.pokemon_search3_post = function (req, res, next){
+//For Your Path Page: Display game recommendations, number, and list of missing Pokemon on POST
+exports.yourPathPost = function (req, res, next){
     //Game count necessary in case user didn't select any boxes
     var gameCount = 0;
     //Seeing whether the user checked the Ultra Sun Box
@@ -487,7 +396,7 @@ exports.pokemon_search3_post = function (req, res, next){
                     }
                     var EventPokemon = {};
                     EventIds.forEach((Id, i) => EventPokemon[Id] = EventNames[i]);
-                    res.render('missing_pokemon2', {title: "Your Path to Catch'em All", pokemon: Pokemon, pokemon_count: pokemonCount, ultra_sun_rec: ultraSunRec, ultra_moon_rec: ultraMoonRec, omega_ruby_rec: omegaRubyRec, alpha_sapphire_rec: alphaSapphireRec, x_rec: xRec, y_rec: yRec, crystal_3ds_rec: crystal3DSRec, event_pokemon: EventPokemon});
+                    res.render('your_path_results', {title: "Your Path to Catch'em All", pokemon: Pokemon, pokemon_count: pokemonCount, ultra_sun_rec: ultraSunRec, ultra_moon_rec: ultraMoonRec, omega_ruby_rec: omegaRubyRec, alpha_sapphire_rec: alphaSapphireRec, x_rec: xRec, y_rec: yRec, crystal_3ds_rec: crystal3DSRec, event_pokemon: EventPokemon});
                 })
             })
         });
@@ -498,51 +407,6 @@ exports.pokemon_search3_post = function (req, res, next){
 
 
 
-//Display Sum of all obtainable Pokemon in Ultra Sun
-exports.search_sum_ultrasun = function (req, res, next){
-    db.get('SELECT SUM(CASE WHEN USun IN ("C","E","B","R","S") THEN 1 ELSE 0 END) AS UltraSum FROM AvPokemon', function (err,row){
-        if (err) {res.send(err.message);}
-        //No error so render
-        var ultraSunSum = 'The Number of Pokémon currently obtainable in Ultra Sun: ' + row.UltraSum;
-        res.render('ultra_sun_sum', {title: 'Ultra Sun Sum of Pokémon', ultra_sum: ultraSunSum});
-    });
-}
-
-//Display list of available pokemon in Ultra Sun
-exports.pokemon_avail_ultrasun = function (req, res, next){
-    console.log("Return list of Pokemon available in Ultra Sun");
-    db.all('SELECT Name FROM AvPokemon WHERE USun IN ("C","E","B","R","S")', function (err,rows) {
-        if (err) {res.send(err.message);}
-        //No error so render.
-        else{
-            var Names = [];
-            for (var i=0; i<rows.length; i++){
-                Names.push(rows[i].Name);
-            }
-            res.render('avail_usun', {title: 'Pokémon Available in Ultra Sun', names: Names});
-        }
-    });
-};
-
-//Display list of Id's and names of all available pokemon in Ultra Moon
-exports.pokemon_avail_ultramoon = function (req, res, next){
-    console.log("Return list of Ids and Pokemon Names of Available Pokemon in Ultra Moon");
-    db.all('SELECT Id, Name FROM AvPokemon WHERE UMoon IN ("C","E","B","R","S")', function (err, rows){
-        if (err) {res.send(err.message);}
-        //No error so render
-        var Ids = [];
-        for (var i=0; i<rows.length; i++){
-            Ids.push(rows[i].Id);
-        }
-        var Names = [];
-        for (var i=0; i<rows.length; i++){
-            Names.push(rows[i].Name);
-        }
-        var Pokemon = {};
-        Ids.forEach((Id, i) => Pokemon[Id] = Names[i]);
-        res.render('avail_umoon', {title: 'Pokémon Available in Ultra Moon', pokemon: Pokemon});
-    });
-};
 
 //Display information about a single pokemon by id
 exports.pokemon_id_search = function (req, res, next){

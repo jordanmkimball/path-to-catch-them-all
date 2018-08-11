@@ -5,6 +5,7 @@ block content
     h1= title
     
     h3 Which games do you own?
+    img#jigglypuff(src = '../images/jigglypuff.png', alt = 'Pixelated Picture of Jigglypuff')
 
     form(method='POST' action='')
       div.form-group 
@@ -21,7 +22,7 @@ block content
             label Sun
             <br>
             input.checkbox-input(type='checkbox', name='moon', id="moonBox", value='moon')
-            label moon
+            label Moon
             <br>
             input.checkbox-input(type='checkbox', name='omega_ruby', id="omegaRubyBox", value='omega_ruby')
             label Omega Ruby
@@ -111,7 +112,7 @@ block content
             <br>
             input.checkbox-input(type='checkbox', name='dual_slot', id='duelSlotBox', value='dual_slot')
             label I have an older DS that allows me to catch Pokémon via Dual Slot Mode (Applies to Diamond, Pearl, and Platinum)
-      
+        
       <br>
       <br>    
       button.btn.btn-primary(type='submit') Submit

@@ -1,9 +1,0 @@
-extends layout
-
-block content
-  div.maintext 
-    h1= title
-
-    each val, key in pokemon
-      p #{key}. 
-        a(href='/search/' + key) #{val}
