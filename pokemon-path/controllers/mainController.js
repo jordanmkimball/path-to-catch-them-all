@@ -5,6 +5,7 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
+
 //Code to use async
 var async = require('async');
 
@@ -344,9 +345,6 @@ exports.yourPathPost = function (req, res, next){
         var sqlRecQuery = 'SELECT ' + sumWhen + 'USun' + inAs + 'USunR,' + sumWhen + 'UMoon' + inAs + 'UMoonR,' + sumWhen + 'OmegaR' + inAs + 'OmegaRR,' + sumWhen + 'AlphaS' + inAs + 'AlphaSR,' + sumWhen + 'X' + inAs + 'XR,' + sumWhen + 'Y' + inAs + 'YR,' +  sumWhen + 'Crystal3DS' + inAs + 'Crystal3DSR ' + 'FROM AvPokemon WHERE ' + newWhereStatement;
         var sqlEventQuery = 'SELECT Id, Name FROM AvPokemon WHERE Id IN (151, 385, 489, 490, 491, 492, 493, 494, 647, 648, 649, 719, 720, 721, 802)'
     }
-    console.log(sqlQuery);
-    console.log(sqlCountQuery);
-    console.log(sqlRecQuery);
     //Now to actually pull the information from the database. 
     db.all(sqlQuery, function (err,rows) {
         if (err) {res.send(err.message);}

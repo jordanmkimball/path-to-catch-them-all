@@ -131,19 +131,6 @@ a.noColor {
   float: right;
 }
 
-#pokeball {
-  width: 25%;
-  max-width: 225px;
-  height: 25%;
-  float: right;
-  opacity: 0.5;
-}
-
-#gamesImg {
-  width: 40%;
-  height: 40%;
-  float: right;
-}
 
 #pikachuImg {
   width: 25%;
