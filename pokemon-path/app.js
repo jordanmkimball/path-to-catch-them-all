@@ -15,7 +15,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
-var helmet = use(helmet())
+
+app.use(helmet());
 
 // view engine setup
 app.use(compression()); //compress all routes
